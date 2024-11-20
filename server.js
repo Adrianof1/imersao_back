@@ -7,8 +7,7 @@ const conexao = await conectarAoBanco(process.env.STRING_CONEXAO);
 // Inicializa o aplicativo Express
 const app = express();
 
-// Permite que o Express entenda requisições com corpo em formato JSON
-app.use(express.json());
+
 
 // Inicia o servidor na porta 3000
 app.listen(3000, () => {

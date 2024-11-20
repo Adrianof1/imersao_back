@@ -1,7 +1,10 @@
 import express from "express"
 
-// Rota para obter todos os posts
-app.get("/posts", async (req, res) => {
+const routes = (app) => {
+    // Permite que o Express entenda requisições com corpo em formato JSON
+    app.use(express.json());
+    // Rota para obter todos os posts
+    app.get("/posts", async (req, res) => {
     try {
         // Chama a função para obter os posts
         const posts = await getTodosPosts();
@@ -13,3 +16,6 @@ app.get("/posts", async (req, res) => {
         res.status(500).json({ message: "Erro interno do servidor" });
     }
 });
+}
+
+export default routes;
