@@ -1,65 +1,50 @@
 import express from "express";
 import conectarAoBanco from "./src/config/dbconfig.js";
-const conexao = await conectarAoBanco(process.env.STRING_CONEXAO)
 
-const posts = [
-    {
-      id: 1,
-      descricao: "Uma foto de cachorro",
-      imagem: "https://placekitten.com/600/400"
-    },
+// Conecta ao banco de dados usando a string de conexão fornecida pela variável de ambiente
+const conexao = await conectarAoBanco(process.env.STRING_CONEXAO);
 
-    {
-      id: 2,
-      descricao: "Gato brincando com um novelo de lã",
-      imagem: "https://placekitten.com/400/200"
-    },
-
-    {
-      id: 3,
-      descricao: "Paisagem de um pôr do sol",
-      imagem: "https://picsum.photos/seed/picsum/600/400"
-    },
-
-    {
-      id: 4,
-      descricao: "Cachorro correndo na praia",
-      imagem: "https://source.unsplash.com/random/600x400/?dog,beach"
-    },
-
-    {
-      id: 5,
-      descricao: "Comida caseira deliciosa",
-      imagem: "https://loremflickr.com/640/480/food"
-    },
-
-    {
-      id: 6,
-      descricao: "Montanha com neve",
-      imagem: "https://unsplash.com/photos/mountain"
-    }
-  ];
-
+// Inicializa o aplicativo Express
 const app = express();
+
+// Permite que o Express entenda requisições com corpo em formato JSON
 app.use(express.json());
+
+// Inicia o servidor na porta 3000
 app.listen(3000, () => {
-    console.log("servidor escutando...");
+    console.log("Servidor escutando na porta 3000");
 });
 
+// Função assíncrona para obter todos os posts do banco de dados
 async function getTodosPosts() {
-  const db = conexao.db("imersao-instabytes")
-  const colecao = db.collection("posts")
+    // Obtém o banco de dados 'imersao-instabytes'
+    const db = conexao.db("imersao-instabytes");
+    // Obtém a coleção 'posts'
+    const colecao = db.collection("posts");
+    // Retorna todos os documentos da coleção como um array
+    return colecao.find().toArray();
 }
-app.get("/posts", (req, res) => {
-    res.status(200) .json(posts);
+
+// Rota para obter todos os posts
+app.get("/posts", async (req, res) => {
+    try {
+        // Chama a função para obter os posts
+        const posts = await getTodosPosts();
+        // Envia os posts como resposta em formato JSON
+        res.status(200).json(posts);
+    } catch (error) {
+        // Caso ocorra um erro, registra no console e envia uma mensagem de erro
+        console.error("Erro ao obter os posts:", error);
+        res.status(500).json({ message: "Erro interno do servidor" });
+    }
 });
 
-function buscarPostPorID(id) {
-  return posts.findIndex((post) => {
-    return post.id === Number(id)
-  })
-}
-app.get("/posts/:id", (req, res) => {
-  const index = buscarPostPorID(req.params.id)
-  res.status(200) .json(posts[index]);
-});
+// function buscarPostPorID(id) {
+//   return posts.findIndex((post) => {
+//     return post.id === Number(id)
+//   })
+// }
+// app.get("/posts/:id", (req, res) => {
+//   const index = buscarPostPorID(req.params.id)
+//   res.status(200) .json(posts[index]);
+// });
